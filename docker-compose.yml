@@ -1,0 +1,47 @@
+services:
+  # フロントエンドコンテナ
+  ui: 
+    build:
+      context: ./ui/
+      dockerfile: Dockerfile
+    volumes:
+      - ./ui:/src/ui
+    ports:
+      - "8888:8888"
+    stdin_open: true
+    environment:
+      - WATCHPACK_POLLING=true
+    tty: true
+    networks:
+      - app-network
+
+  # バックエンドエンドコンテナ
+  api:
+    build: 
+      context: ./api/
+      dockerfile: Dockerfile
+    volumes:
+      - ./api:/api
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+  # DB コンテナ
+  mysql:
+    image: mysql:8.0.27
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    restart: always
+    networks:
+      - app-network
+
+# コンテナ間通信ネットワーク設定
+networks:
+  app-network:
+    driver: bridge 
