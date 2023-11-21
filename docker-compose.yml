@@ -2,10 +2,10 @@ services:
   # フロントエンドコンテナ
   ui: 
     build:
-      context: ./ui/
+      context: ../qr-order-ui/
       dockerfile: Dockerfile
     volumes:
-      - ./ui:/src/ui
+      - ../qr-order-ui:/app/src
     ports:
       - "8888:8888"
     stdin_open: true
@@ -18,10 +18,10 @@ services:
   # バックエンドエンドコンテナ
   api:
     build: 
-      context: ./api/
+      context: ../qr-order-api/
       dockerfile: Dockerfile
     volumes:
-      - ./api:/api
+      - ../qr-order-api/:/app/src
     ports:
       - "9090:9090"
     networks:
@@ -30,16 +30,24 @@ services:
   # DB コンテナ
   mysql:
     image: mysql:8.0.27
+    volumes:
+      - mysql_local:/var/lib/mysql
+      - ../qr-order-api/initdb.d:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: mysql
-      MYSQL_DATABASE: db
+      MYSQL_DATABASE: qr_order_system
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     restart: always
     networks:
       - app-network
+    platform: linux/x86_64
+
+# 名前付きボリューム
+volumes:
+  mysql_local:
 
 # コンテナ間通信ネットワーク設定
 networks:
